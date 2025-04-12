@@ -15,8 +15,8 @@ WIFI_PASSWORD = "unda7180"
 # ===== MQTT Settings =====
 MQTT_BROKER = "192.168.168.29"
 MQTT_PORT = 1883
-MQTT_TOPIC_ACCESS = b"fastapi/access"  # For access notifications
-MQTT_TOPIC_SECURITY = b"fastapi/security"  # For security alerts
+MQTT_TOPIC_ACCESS = b"fastapi/access"
+MQTT_TOPIC_SECURITY = b"fastapi/security"
 MQTT_USER = ""
 MQTT_PASSWORD = ""
 CLIENT_ID = b"esp32micro"
@@ -91,15 +91,17 @@ def trigger_alarm(client):
 
 # ===== Main Loop =====
 def main():
+    global DOOR_OPEN, ACCESS_GRANTED, ALARM_ACTIVE
+    
     # Initialize hardware
     GREEN_LED.off()
-    RED_LED.off()
+    RED_LED.on()
     
     # Connect to network
     connect_wifi()
     mqtt_client = connect_mqtt()
     
-    # Simulate access check (replace with your actual access control logic)
+    # Simulate access check
     access_counter = 0
     
     while True:
@@ -110,14 +112,14 @@ def main():
             print("Door opened")
             DOOR_OPEN = True
             
-            # Simulate access check (replace with your actual logic)
+            # Simulate access check
             access_counter += 1
-            if access_counter % 2 == 1:  # Every odd attempt is granted
+            if access_counter % 2 == 1:  # Every odd attempt granted
                 grant_access(mqtt_client)
             else:
                 deny_access(mqtt_client)
                 
-                # If door opened without permission, trigger alarm
+                # Trigger alarm if unauthorized
                 if not ACCESS_GRANTED:
                     trigger_alarm(mqtt_client)
                     
